@@ -67,6 +67,11 @@ jobs:
     name: Deploy
     runs-on: [ self-hosted, deploy-spring-backend ]
     steps:
+      - name: Set up environment variables
+        run: |
+          echo "GHCR_TOKEN=${{ secrets.GHCR_TOKEN }}" >> $GITHUB_ENV
+          echo "GITHUB_ACTOR=${{ github.actor }}" >> $GITHUB_ENV
+
       - name: Deploy to prod
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -75,10 +80,5 @@ jobs:
           key: ${{ secrets.BASTION_PRIVATE_KEY }}
           script_stop: true
           script: |
-            pwd
-            ls -al
-
             cd deploy_scripts
-            pwd
-            
-            ./run_backend_deploy.sh
+            ./run_backend_deploy.sh $GHCR_TOKEN $GITHUB_ACTOR
